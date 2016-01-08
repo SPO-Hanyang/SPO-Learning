@@ -1,4 +1,4 @@
-function [w,b,delta] = h_h_updates(batch_size,learning_rate,w,b,in,out,prev_w,prev_delta,activation)
+function [w,b,delta] = h_h_updates(learning_rate,w,b,in,out,prev_w,prev_delta,activation)
     
     out_size = size(out);
     

@@ -13,9 +13,7 @@ function [output] = convlayer(input,image_shape,filter_shape,w,b)
         end
     end
     
-    for i = [1 : 1 : conv_size(2)]
-        conv_out(:,i,:) = conv_out(:,i,:) + b(i);
-    end
+    conv_out = conv_out + repmat(repmat(b,[1 conv_size(1)]).',[1 1 conv_size(3)]);
     
     output = tanh(conv_out);
     

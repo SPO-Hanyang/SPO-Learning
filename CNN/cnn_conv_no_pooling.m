@@ -21,6 +21,7 @@ patience_increase = 2;
 improvement_threshold = 0.995;
 
 validation_frequency = min(n_train_batches,patience/2);
+validation_frequency = 10;
 
 best_validation_loss = 999999;
 best_iter = 0;
@@ -54,8 +55,6 @@ n_out = 10;
 
 while(epoch<=n_epochs && looping)
     
-    tic;
-    
     if(epoch == 0)
         fprintf('Training...\n');
     end
@@ -66,7 +65,6 @@ while(epoch<=n_epochs && looping)
         if(rem(iter,10)==0)
             fprintf('training iter = %d\n',iter);
         end
-        
         % make minibatch size data
         % x = 784*500
         x = train_x((minibatch_index-1)*batch_size+1:minibatch_index*batch_size,:).';
@@ -100,13 +98,20 @@ while(epoch<=n_epochs && looping)
         
         % negative_log_likelihood
         [cost] = negative_log_likelihood(p_y_given_x,y);
-        
+  
         % updates
-        [w3,b3,delta3] = h_o_updates(batch_size,learning_rate,w3,b3,layer3_input,p_y_given_x,y,'softmax');
-        [w2,b2,delta2] = h_h_updates(batch_size,learning_rate,w2,b2,layer2_input,output2,w3,delta3,'tanh');
-        [w1,b1,delta1] = c_h_updates(batch_size,learning_rate,filter_shape1,w1,b1,layer1_input,output1,w2,delta2,'tanh');
-        [w0,b0,delta0] = c_c_updates(batch_size,learning_rate,filter_shape0,w0,b0,layer0_input,output0,filter_shape1,w1,delta1,'tanh');
-        
+        tic
+        [w3,b3,delta3] = h_o_updates(learning_rate,w3,b3,layer3_input,p_y_given_x,y,'softmax');
+        toc
+        tic
+        [w2,b2,delta2] = h_h_updates(learning_rate,w2,b2,layer2_input,output2,w3,delta3,'tanh');
+        toc
+        tic
+        [w1,b1,delta1] = c_h_updates(learning_rate,filter_shape1,w1,b1,layer1_input,output1,w2,delta2,'tanh');
+        toc
+        tic
+        [w0,b0,delta0] = c_c_updates(learning_rate,filter_shape0,w0,b0,layer0_input,output0,filter_shape1,w1,delta1,'tanh');
+        toc
         % validation check
         if(rem(iter+1,validation_frequency) == 0)
             validation_losses = zeros(n_valid_batches,1);
@@ -187,7 +192,7 @@ while(epoch<=n_epochs && looping)
             looping = 0;
         end
     end
-    toc;
+    
     epoch = epoch+1;
 end
 

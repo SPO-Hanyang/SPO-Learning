@@ -1,24 +1,21 @@
-function [w,b,delta] = h_o_updates(batch_size,learning_rate,w,b,in,out,des,activation)
+function [w,b,delta] = h_o_updates(learning_rate,w,b,in,out,des,activation)
     
-    out_size = size(out,1);
-
-    delta = zeros(out_size,batch_size);
+    out_size = size(out);
     
-    %theano
-    for i = [1 : 1 : batch_size]
-        del = zeros(out_size,1);
-        true = des(i);
-        err = out(:,i)-[zeros(true-1,1); 1; zeros(10-true,1)];
-        if activation == 'sigmoid'
-            del = (err.*out(:,i).*(ones(10,1)-out(:,i)));
-        elseif activation == 'softmax'
-            del = err;
-        end
-        del = del/batch_size;
-        
-        w = w - learning_rate*(del*in(:,i).');
-        b = b - learning_rate*del;
-        
-        delta(:,i) = del;
+    err = zeros(out_size);
+    for i = [1 : 1 : out_size(2)]
+        err(:,i) = out(:,i)-[zeros(des(i)-1,1); 1; zeros(10-des(i),1)];
     end
+    
+    if activation == 'sigmoid'
+        delta = (err.*out.*(ones(out_size)-out));
+    elseif activation == 'softmax'
+        delta = err;
+    end
+    delta = delta/out_size(2);
+    
+    w = w - learning_rate*(delta*in.');
+    b = b - learning_rate*sum(delta,2);
 end
+
+%diag(pred([1:size(pred,1)],y))
