@@ -14,10 +14,8 @@ function [w,b,delta] = c_h_updates(learning_rate,filter_shape,w,b,in,out,prev_w,
     
     for i = [1 : 1 : filter_shape(2)]
         for j = [1 : 1 : filter_shape(1)]
-            for m = [1 : 1 : filter_shape(4)]
-                temp_res=in(j:j+out_size(1)-1,i:i+out_size(2)-1,:,:).*repmat(delta(:,:,m,:),[1 1 filter_shape(3) 1]);
-                temp_w(j,i,:,m) = sum(sum(sum(temp_res,4),2),1);
-            end
+            temp_res=reshape(permute(in(j:j+out_size(1)-1,i:i+out_size(2)-1,:,:),[1 2 4 3]),[prod(out_size(1:2))*out_size(4) filter_shape(3)]).'*reshape(permute(delta,[1 2 4 3]),[prod(out_size(1:2))*out_size(4) filter_shape(4)]);
+            temp_w(j,i,:,:) = temp_res;
         end
     end
     

@@ -21,7 +21,6 @@ patience_increase = 2;
 improvement_threshold = 0.995;
 
 validation_frequency = min(n_train_batches,patience/2);
-validation_frequency = 10;
 
 best_validation_loss = 999999;
 best_iter = 0;
@@ -100,18 +99,10 @@ while(epoch<=n_epochs && looping)
         [cost] = negative_log_likelihood(p_y_given_x,y);
   
         % updates
-        tic
         [w3,b3,delta3] = h_o_updates(learning_rate,w3,b3,layer3_input,p_y_given_x,y,'softmax');
-        toc
-        tic
         [w2,b2,delta2] = h_h_updates(learning_rate,w2,b2,layer2_input,output2,w3,delta3,'tanh');
-        toc
-        tic
         [w1,b1,delta1] = c_h_updates(learning_rate,filter_shape1,w1,b1,layer1_input,output1,w2,delta2,'tanh');
-        toc
-        tic
         [w0,b0,delta0] = c_c_updates(learning_rate,filter_shape0,w0,b0,layer0_input,output0,filter_shape1,w1,delta1,'tanh');
-        toc
         % validation check
         if(rem(iter+1,validation_frequency) == 0)
             validation_losses = zeros(n_valid_batches,1);
@@ -182,6 +173,17 @@ while(epoch<=n_epochs && looping)
                     
                     test_losses(minibatch_test) = errors;
                 end
+                
+                best_w0 = w0;
+                best_w1 = w1;
+                best_w2 = w2;
+                best_w3 = w3;
+                
+                best_b0 = b0;
+                best_b1 = b1;
+                best_b2 = b2;
+                best_b3 = b3;
+                
                 
                 test_score = mean(test_losses);
                 fprintf('epoch %d, minibatch %d/%d, test error of best model %f\n',epoch+1,minibatch_index,n_train_batches,test_score*100);
